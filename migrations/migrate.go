@@ -1,4 +1,4 @@
-// migrations/migrate.go
+// migrations/migrate.go - alternative approach
 package migrations
 
 import (
@@ -11,12 +11,14 @@ import (
 func RunMigrations(db *gorm.DB) {
 	log.Println("Running migrations...")
 
-	// Add your models here
-	err := db.AutoMigrate(
-		&models.User{},
-		// Add more models here
-	)
+	// Drop the table if it exists
+	err := db.Migrator().DropTable(&models.User{})
+	if err != nil {
+		log.Fatal("Failed to drop table:", err)
+	}
 
+	// Run auto migrations to create the table with new structure
+	err = db.AutoMigrate(&models.User{})
 	if err != nil {
 		log.Fatal("Failed to migrate database:", err)
 	}
