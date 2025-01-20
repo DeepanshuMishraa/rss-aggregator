@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"os"
 
+	"github.com/deepanshumishraa/migrations"
 	"github.com/go-chi/chi"
 	"github.com/go-chi/cors"
 	"github.com/joho/godotenv"
@@ -20,6 +21,10 @@ func main() {
 		log.Fatal("PORT is not set")
 	}
 
+	db := ConnectDB()
+
+	migrations.RunMigrations(db)
+
 	router := chi.NewRouter()
 
 	router.Use(cors.Handler(cors.Options{
@@ -34,7 +39,7 @@ func main() {
 	v1Router := chi.NewRouter()
 
 	v1Router.Get("/healthz", HandlerReadiness)
-	v1Router.Get("/err", handleErr);
+	v1Router.Get("/err", handleErr)
 
 	router.Mount("/v1", v1Router)
 
