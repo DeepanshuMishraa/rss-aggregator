@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"encoding/json"
+	"log"
 	"net/http"
 
 	"github.com/deepanshumishraa/models"
@@ -23,9 +24,12 @@ func CreateUserHandler(db *gorm.DB) http.HandlerFunc {
 
 		result := db.Create(&user)
 		if result.Error != nil {
+			log.Printf("Error creating user: %v", result.Error)
 			http.Error(w, "Failed to create user", http.StatusInternalServerError)
 			return
 		}
+
+		log.Printf("User created: %+v", user)
 
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusCreated)
