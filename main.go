@@ -1,6 +1,7 @@
 package main
 
 import (
+	"database/sql"
 	"fmt"
 	"log"
 	"net/http"
@@ -10,7 +11,12 @@ import (
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/go-chi/cors"
 	"github.com/joho/godotenv"
+	_ "github.com/lib/pq"
 )
+
+type apiConfig struct {
+	DB *database.Queries
+}
 
 func main() {
 
@@ -24,6 +30,22 @@ func main() {
 
 	fmt.Println("Port: ", port)
 
+	dbString := os.Getenv("DATABASE_URL")
+
+	if dbString == "" {
+		log.Fatal("DATABASE_URL environment variable not set")
+	}
+
+	fmt.Println("Database URL: ", dbString)
+	conn, err := sql.Open("postgres", dbString)
+
+	if err != nil {
+		log.Fatal("Error connecting to database: ", err)
+	}
+
+	apiConfig := apiConfig{
+		DB:database.New
+	}
 	router := chi.NewRouter()
 
 	router.Use(cors.Handler(cors.Options{
